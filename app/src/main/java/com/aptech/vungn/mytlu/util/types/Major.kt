@@ -1,0 +1,10 @@
+package com.aptech.vungn.mytlu.util.types
+
+enum class Major {
+    INFORMATION_TECHNOLOGY,
+    ECONOMIC_SECTORS,
+    ELECTRONIC_ENGINEERING,
+    MECHANICAL_ENGINEERING,
+    WATER_RESOURCES_ENGINEERING,
+    CIVIL_ENGINEERING
+}

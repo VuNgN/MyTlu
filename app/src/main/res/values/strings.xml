@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">MyTlu</string>
+    <string name="email_login_label">Mã sinh viên hoặc email</string>
+    <string name="password_login_label">Mật khẩu</string>
+    <string name="login_button">Đăng nhập</string>
+</resources>
