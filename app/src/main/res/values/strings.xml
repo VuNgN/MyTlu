@@ -3,4 +3,11 @@
     <string name="email_login_label">Mã sinh viên hoặc email</string>
     <string name="password_login_label">Mật khẩu</string>
     <string name="login_button">Đăng nhập</string>
+    <string name="home_tab">Trang chủ</string>
+    <string name="notification_tab">Thông báo</string>
+    <string name="drawer_item_profile">Thông tin cá nhân</string>
+    <string name="drawer_item_academic_results">Kết quả học tập</string>
+    <string name="drawer_item_attendance_history">Lịch sử điểm danh</string>
+    <string name="drawer_item_dark_mode">Chế độ ban đêm</string>
+    <string name="drawer_item_logout">Đăng xuất</string>
 </resources>
