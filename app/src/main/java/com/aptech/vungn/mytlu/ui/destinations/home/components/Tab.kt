@@ -61,8 +61,8 @@ fun Tabs(pagerState: PagerState, coroutineScope: CoroutineScope) {
                     unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-
-        })
+        }
+    )
 }
 
 fun Modifier.customTabIndicatorOffset(

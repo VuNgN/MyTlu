@@ -10,4 +10,6 @@
     <string name="drawer_item_attendance_history">Lịch sử điểm danh</string>
     <string name="drawer_item_dark_mode">Chế độ ban đêm</string>
     <string name="drawer_item_logout">Đăng xuất</string>
+    <string name="menu_button_newspaper">Tin tức</string>
+    <string name="menu_button_attendance">Điểm danh</string>
 </resources>

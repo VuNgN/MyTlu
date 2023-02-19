@@ -1,27 +1,31 @@
 package com.aptech.vungn.mytlu.ui.destinations.home
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
+import com.aptech.vungn.mytlu.R
 import com.aptech.vungn.mytlu.data.model.User
 import com.aptech.vungn.mytlu.ui.destinations.home.components.DrawerContent
+import com.aptech.vungn.mytlu.ui.destinations.home.components.MenuButtonRow
 import com.aptech.vungn.mytlu.ui.destinations.home.components.MyTluLogo
 import com.aptech.vungn.mytlu.ui.destinations.home.components.Tabs
 import com.aptech.vungn.mytlu.ui.destinations.home.vm.HomeViewModel
@@ -115,7 +119,43 @@ fun Notification(modifier: Modifier = Modifier) {
 
 @Composable
 fun Home(modifier: Modifier = Modifier) {
-    Surface(modifier = modifier.fillMaxSize()) {}
+    val isDarkMode = isSystemInDarkTheme()
+    Surface(
+        modifier = modifier.fillMaxSize(),
+        color = if (isDarkMode) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.primary.copy(
+            alpha = 0.05f
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            MenuButtonRow(
+                icon1 = Icons.Rounded.Newspaper,
+                title1 = stringResource(id = R.string.menu_button_newspaper),
+                onClick1 = {},
+                icon2 = Icons.Rounded.HowToReg,
+                title2 = stringResource(id = R.string.menu_button_attendance),
+                onClick2 = {}
+            )
+            MenuButtonRow(
+                icon1 = Icons.Rounded.Exposure,
+                title1 = stringResource(id = R.string.menu_button_newspaper),
+                onClick1 = {},
+                icon2 = Icons.Rounded.Pages,
+                title2 = stringResource(id = R.string.menu_button_attendance),
+                onClick2 = {}
+            )
+            MenuButtonRow(
+                icon1 = Icons.Rounded.AcUnit,
+                title1 = stringResource(id = R.string.menu_button_newspaper),
+                onClick1 = {}
+            )
+        }
+    }
 }
 
 @Preview(showSystemUi = true)
