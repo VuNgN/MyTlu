@@ -12,7 +12,10 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -20,13 +23,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.aptech.vungn.mytlu.util.lists.TabName
 import com.aptech.vungn.mytlu.util.lists.tabList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun Tabs(pagerState: PagerState, coroutineScope: CoroutineScope) {
+fun Tabs(pagerState: PagerState, coroutineScope: CoroutineScope, badgeNumber: Int) {
     val tabWidths = remember {
         val tabWidthStateList = mutableStateListOf<Dp>()
         repeat(tabList.size) {
@@ -50,10 +54,24 @@ fun Tabs(pagerState: PagerState, coroutineScope: CoroutineScope) {
                 val isSelected = pagerState.currentPage == index
                 Tab(
                     icon = {
-                        Icon(
-                            imageVector = if (isSelected) item.selectedIcon else item.unselectIcon,
-                            contentDescription = item.titleResource,
-                        )
+                        if (item.name == TabName.NOTIFICATION) {
+                            BadgedBox(
+                                badge = {
+                                    Badge(modifier = Modifier.offset(x = (-8).dp, y = 8.dp)) {
+                                        Text(text = "$badgeNumber")
+                                    }
+                                }) {
+                                Icon(
+                                    imageVector = if (isSelected) item.selectedIcon else item.unselectIcon,
+                                    contentDescription = item.title,
+                                )
+                            }
+                        } else {
+                            Icon(
+                                imageVector = if (isSelected) item.selectedIcon else item.unselectIcon,
+                                contentDescription = item.title,
+                            )
+                        }
                     },
                     selected = isSelected,
                     onClick = { coroutineScope.launch { pagerState.animateScrollToPage(index) } },

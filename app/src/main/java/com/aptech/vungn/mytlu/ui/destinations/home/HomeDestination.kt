@@ -10,11 +10,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -37,16 +34,17 @@ import java.util.*
 @Composable
 fun HomeDestination(viewModel: HomeViewModel) {
     val user by viewModel.user.observeAsState()
+    val badgeNumber by viewModel.badgeNumber.collectAsState()
     MyTluTheme {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-            HomeScreen(user = user)
+            HomeScreen(user = user, badgeNumber = badgeNumber)
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier, user: User?) {
+fun HomeScreen(modifier: Modifier = Modifier, user: User?, badgeNumber: Int) {
     val pagerState = rememberPagerState()
     val coroutineScope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -65,7 +63,7 @@ fun HomeScreen(modifier: Modifier = Modifier, user: User?) {
                 Scaffold(
                     modifier = modifier,
                     topBar = {
-                        TopBar(coroutineScope, drawerState, pagerState)
+                        TopBar(coroutineScope, drawerState, pagerState, badgeNumber)
                     },
                 ) { paddingValues ->
                     Box(
@@ -95,7 +93,8 @@ fun HomeScreen(modifier: Modifier = Modifier, user: User?) {
 private fun TopBar(
     coroutineScope: CoroutineScope,
     drawerState: DrawerState,
-    pagerState: PagerState
+    pagerState: PagerState,
+    badgeNumber: Int
 ) {
     Column(modifier = Modifier) {
         TopAppBar(modifier = Modifier, title = {
@@ -108,7 +107,7 @@ private fun TopBar(
                 )
             }
         })
-        Tabs(pagerState, coroutineScope)
+        Tabs(pagerState, coroutineScope, badgeNumber)
     }
 }
 
@@ -179,7 +178,8 @@ fun PreviewHomeScreen() {
                 "",
                 "",
                 ""
-            )
+            ),
+            badgeNumber = 10
         )
     }
 }

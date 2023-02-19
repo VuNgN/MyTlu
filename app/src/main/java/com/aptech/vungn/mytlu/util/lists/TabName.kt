@@ -11,11 +11,13 @@ import com.aptech.vungn.mytlu.R
 
 val tabList = listOf(
     Tab(
+        TabName.HOME,
         Icons.Outlined.Home,
         Icons.Rounded.Home,
         MyTluApplication.context.getString(R.string.home_tab)
     ),
     Tab(
+        TabName.NOTIFICATION,
         Icons.Outlined.Notifications,
         Icons.Rounded.Notifications,
         MyTluApplication.context.getString(R.string.notification_tab)
@@ -23,7 +25,13 @@ val tabList = listOf(
 )
 
 data class Tab(
+    val name: TabName,
     val unselectIcon: ImageVector,
     val selectedIcon: ImageVector,
-    val titleResource: String
+    val title: String
 )
+
+enum class TabName {
+    HOME,
+    NOTIFICATION
+}
