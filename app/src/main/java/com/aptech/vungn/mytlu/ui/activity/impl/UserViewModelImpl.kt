@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import com.aptech.vungn.mytlu.data.model.UserPreference
+import com.aptech.vungn.mytlu.repo.LogoutRepository
 import com.aptech.vungn.mytlu.repo.UserRepository
 import com.aptech.vungn.mytlu.ui.activity.UserViewModel
 import com.aptech.vungn.mytlu.util.LoginState
@@ -15,6 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class UserViewModelImpl @Inject constructor(
     private val loginStateStorage: LoginStateStorage,
+    private val logoutRepository: LogoutRepository,
     userRepository: UserRepository
 ) : ViewModel(), UserViewModel {
     private val _loginState: MutableStateFlow<LoginState> = loginStateStorage.state
@@ -24,5 +26,10 @@ class UserViewModelImpl @Inject constructor(
     override val user: LiveData<UserPreference?> = _user
     override fun onLoggedIn() {
         loginStateStorage.onLoggedIn()
+    }
+
+    override suspend fun logout() {
+        loginStateStorage.onLogout()
+        logoutRepository.logout()
     }
 }

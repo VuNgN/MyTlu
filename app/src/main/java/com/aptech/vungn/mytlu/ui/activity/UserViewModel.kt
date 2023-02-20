@@ -9,4 +9,5 @@ interface UserViewModel {
     val loginState: MutableStateFlow<LoginState>
     val user: LiveData<UserPreference?>
     fun onLoggedIn()
+    suspend fun logout()
 }

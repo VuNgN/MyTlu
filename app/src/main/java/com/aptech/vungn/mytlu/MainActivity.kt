@@ -10,6 +10,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
@@ -31,6 +32,7 @@ import com.aptech.vungn.mytlu.util.LoginState
 import com.aptech.vungn.mytlu.util.consts.Const.LOGIN_SUCCESSFUL
 import com.aptech.vungn.mytlu.util.consts.Routes
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -106,7 +108,11 @@ class MainActivity : ComponentActivity() {
                         }
                 }
                 val homeViewModel: HomeViewModel = hiltViewModel<HomeViewModelImpl>()
-                HomeDestination(viewModel = homeViewModel)
+                val coroutineScope = rememberCoroutineScope()
+                HomeDestination(
+                    viewModel = homeViewModel,
+                    logout = { coroutineScope.launch { userViewModel.logout() } }
+                )
             }
             composable(route = Routes.ATTENDANCE_DESTINATION) {
 

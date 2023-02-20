@@ -27,24 +27,26 @@ import com.aptech.vungn.mytlu.ui.destinations.home.components.MyTluLogo
 import com.aptech.vungn.mytlu.ui.destinations.home.components.Tabs
 import com.aptech.vungn.mytlu.ui.destinations.home.vm.HomeViewModel
 import com.aptech.vungn.mytlu.ui.theme.MyTluTheme
+import com.aptech.vungn.mytlu.util.lists.DrawerItemName
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.util.*
 
 @Composable
-fun HomeDestination(viewModel: HomeViewModel) {
+fun HomeDestination(viewModel: HomeViewModel, logout: () -> Job) {
     val user by viewModel.user.observeAsState()
     val badgeNumber by viewModel.badgeNumber.collectAsState()
     MyTluTheme {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-            HomeScreen(user = user, badgeNumber = badgeNumber)
+            HomeScreen(user = user, badgeNumber = badgeNumber, onLogout = { logout() })
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier, user: User?, badgeNumber: Int) {
+fun HomeScreen(modifier: Modifier = Modifier, user: User?, badgeNumber: Int, onLogout: () -> Unit) {
     val pagerState = rememberPagerState()
     val coroutineScope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -55,7 +57,20 @@ fun HomeScreen(modifier: Modifier = Modifier, user: User?, badgeNumber: Int) {
             drawerContent = {
                 DrawerContent(
                     user = user,
-                    onClose = { coroutineScope.launch { drawerState.close() } }
+                    onClose = { coroutineScope.launch { drawerState.close() } },
+                    onItemClick = { name ->
+                        coroutineScope.launch {
+                            when (name) {
+                                DrawerItemName.PROFILE -> {}
+                                DrawerItemName.ACADEMIC_RESULT -> {}
+                                DrawerItemName.ATTENDANCE_HISTORY -> {}
+                                DrawerItemName.DARK_MODE -> {}
+                                DrawerItemName.LOGOUT -> {
+                                    onLogout()
+                                }
+                            }
+                        }
+                    }
                 )
             }
         ) {
@@ -179,7 +194,8 @@ fun PreviewHomeScreen() {
                 "",
                 ""
             ),
-            badgeNumber = 10
+            badgeNumber = 10,
+            onLogout = {}
         )
     }
 }

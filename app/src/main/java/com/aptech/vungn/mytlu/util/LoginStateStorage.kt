@@ -14,4 +14,8 @@ class LoginStateStorage {
     fun onLoggedIn() {
         _state.value = LoginState.LoggedIn
     }
+
+    fun onLogout() {
+        _state.value = LoginState.NotLoggedIn
+    }
 }

@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.aptech.vungn.mytlu.data.model.User
 import com.aptech.vungn.mytlu.ui.theme.MyTluTheme
+import com.aptech.vungn.mytlu.util.lists.DrawerItemName
 import com.aptech.vungn.mytlu.util.lists.drawerBodyItems
 import com.aptech.vungn.mytlu.util.lists.drawerFooterItems
 import java.util.*
@@ -30,7 +31,8 @@ import java.util.*
 fun DrawerContent(
     modifier: Modifier = Modifier,
     user: User?,
-    onClose: () -> Unit
+    onClose: () -> Unit,
+    onItemClick: (DrawerItemName) -> Unit
 ) {
     ModalDrawerSheet(modifier = modifier.padding(top = 20.dp, bottom = 20.dp, end = 30.dp)) {
         Spacer(Modifier.height(12.dp))
@@ -42,9 +44,9 @@ fun DrawerContent(
             ) {
                 DrawerHeading(modifier = Modifier.padding(20.dp), user = user, onClose = onClose)
                 Divider(modifier = Modifier.padding(horizontal = 20.dp))
-                DrawerBody()
+                DrawerBody(onItemClick = onItemClick)
                 Divider(modifier = Modifier.padding(horizontal = 20.dp))
-                DrawerFooter()
+                DrawerFooter(onItemClick = onItemClick)
             }
         }
     }
@@ -100,31 +102,39 @@ fun DrawerHeading(
 }
 
 @Composable
-private fun DrawerBody(
-) {
+private fun DrawerBody(onItemClick: (DrawerItemName) -> Unit) {
     Column(modifier = Modifier.fillMaxWidth()) {
         drawerBodyItems.forEach { item ->
-            DrawerButton(icon = item.icon, title = item.title)
+            DrawerButton(icon = item.icon, title = item.title, onClick = { onItemClick(item.name) })
         }
     }
 }
 
 @Composable
-fun DrawerFooter() {
+fun DrawerFooter(onItemClick: (DrawerItemName) -> Unit) {
     Column(modifier = Modifier.fillMaxWidth()) {
         drawerFooterItems.forEach { item ->
-            DrawerButton(icon = item.icon, title = item.title)
+            DrawerButton(
+                icon = item.icon,
+                title = item.title,
+                onClick = { onItemClick(item.name) }
+            )
         }
     }
 }
 
 @Composable
-fun DrawerButton(modifier: Modifier = Modifier, icon: ImageVector, title: String) {
+fun DrawerButton(
+    modifier: Modifier = Modifier,
+    icon: ImageVector,
+    title: String,
+    onClick: () -> Unit
+) {
     Box(
         modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .clickable { }, contentAlignment = Alignment.Center
+            .clickable { onClick() }, contentAlignment = Alignment.Center
     ) {
         Row(
             modifier = modifier
@@ -181,6 +191,6 @@ fun PreviewDrawerHeading() {
 @Composable
 fun PreviewDrawerButton() {
     MaterialTheme {
-        DrawerButton(icon = Icons.Rounded.Person, title = "Thông tin cá nhân")
+        DrawerButton(icon = Icons.Rounded.Person, title = "Thông tin cá nhân", onClick = {})
     }
 }
