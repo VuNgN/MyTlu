@@ -12,4 +12,9 @@
     <string name="drawer_item_logout">Đăng xuất</string>
     <string name="menu_button_newspaper">Tin tức</string>
     <string name="menu_button_attendance">Điểm danh</string>
+    <string name="notification_title">Thông báo</string>
+    <string name="today">Hôm nay</string>
+    <string name="this_week">Tuần này</string>
+    <string name="earlier">Xa hơn nữa</string>
+    <string name="attendance_button">Điểm danh</string>
 </resources>

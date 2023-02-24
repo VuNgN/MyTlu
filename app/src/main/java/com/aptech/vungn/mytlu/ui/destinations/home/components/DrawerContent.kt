@@ -22,9 +22,9 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.aptech.vungn.mytlu.data.model.User
 import com.aptech.vungn.mytlu.ui.theme.MyTluTheme
-import com.aptech.vungn.mytlu.util.lists.DrawerItemName
 import com.aptech.vungn.mytlu.util.lists.drawerBodyItems
 import com.aptech.vungn.mytlu.util.lists.drawerFooterItems
+import com.aptech.vungn.mytlu.util.types.DrawerItemName
 import java.util.*
 
 @Composable
@@ -166,12 +166,12 @@ fun PreviewDrawerHeading() {
     MyTluTheme {
         DrawerHeading(
             user = User(
-                "Vu",
-                "Nguyen Ngoc",
                 "",
                 "",
                 "",
-                "1951061127",
+                "",
+                "",
+                "",
                 "",
                 "",
                 "",

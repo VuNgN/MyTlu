@@ -8,6 +8,7 @@ import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.aptech.vungn.mytlu.MyTluApplication
 import com.aptech.vungn.mytlu.R
+import com.aptech.vungn.mytlu.util.types.TabName
 
 val tabList = listOf(
     Tab(
@@ -30,8 +31,3 @@ data class Tab(
     val selectedIcon: ImageVector,
     val title: String
 )
-
-enum class TabName {
-    HOME,
-    NOTIFICATION
-}

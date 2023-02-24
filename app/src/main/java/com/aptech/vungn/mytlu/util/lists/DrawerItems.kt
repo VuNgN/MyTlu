@@ -5,6 +5,7 @@ import androidx.compose.material.icons.rounded.*
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.aptech.vungn.mytlu.MyTluApplication
 import com.aptech.vungn.mytlu.R
+import com.aptech.vungn.mytlu.util.types.DrawerItemName
 
 val drawerBodyItems = listOf(
     DrawerItem(
@@ -38,11 +39,3 @@ val drawerFooterItems = listOf(
 )
 
 data class DrawerItem(val name: DrawerItemName, val icon: ImageVector, val title: String)
-
-enum class DrawerItemName {
-    PROFILE,
-    ACADEMIC_RESULT,
-    ATTENDANCE_HISTORY,
-    DARK_MODE,
-    LOGOUT
-}

@@ -57,6 +57,7 @@ dependencies {
 
     // Room
     implementation "androidx.room:room-runtime:$room_version"
+    implementation 'com.google.android.gms:play-services-cast-framework:21.0.1'
     kapt "androidx.room:room-compiler:$room_version"
 
     // Data store

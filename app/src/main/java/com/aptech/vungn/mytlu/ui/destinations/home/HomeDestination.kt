@@ -3,6 +3,7 @@ package com.aptech.vungn.mytlu.ui.destinations.home
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
@@ -16,18 +17,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.aptech.vungn.mytlu.R
+import com.aptech.vungn.mytlu.data.model.Notification
 import com.aptech.vungn.mytlu.data.model.User
-import com.aptech.vungn.mytlu.ui.destinations.home.components.DrawerContent
-import com.aptech.vungn.mytlu.ui.destinations.home.components.MenuButtonRow
-import com.aptech.vungn.mytlu.ui.destinations.home.components.MyTluLogo
-import com.aptech.vungn.mytlu.ui.destinations.home.components.Tabs
+import com.aptech.vungn.mytlu.ui.destinations.home.components.*
 import com.aptech.vungn.mytlu.ui.destinations.home.vm.HomeViewModel
 import com.aptech.vungn.mytlu.ui.theme.MyTluTheme
-import com.aptech.vungn.mytlu.util.lists.DrawerItemName
+import com.aptech.vungn.mytlu.util.date.sort.getEarlierNotification
+import com.aptech.vungn.mytlu.util.date.sort.getThisWeekNotification
+import com.aptech.vungn.mytlu.util.date.sort.getTodayNotification
+import com.aptech.vungn.mytlu.util.types.DrawerItemName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -37,16 +40,33 @@ import java.util.*
 fun HomeDestination(viewModel: HomeViewModel, logout: () -> Job) {
     val user by viewModel.user.observeAsState()
     val badgeNumber by viewModel.badgeNumber.collectAsState()
+    val notifications = viewModel.notifications.collectAsState()
+    val isNotificationLoading = viewModel.isNotificationLoading.collectAsState()
     MyTluTheme {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-            HomeScreen(user = user, badgeNumber = badgeNumber, onLogout = { logout() })
+            HomeScreen(
+                user = user,
+                badgeNumber = badgeNumber,
+                notifications = notifications,
+                isNotificationLoading = isNotificationLoading,
+                onLogout = { logout() },
+                onGetNotifications = { viewModel.getNotifications() }
+            )
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier, user: User?, badgeNumber: Int, onLogout: () -> Unit) {
+fun HomeScreen(
+    modifier: Modifier = Modifier,
+    user: User?,
+    badgeNumber: Int,
+    notifications: State<List<Notification>>,
+    isNotificationLoading: State<Boolean>,
+    onLogout: () -> Unit,
+    onGetNotifications: () -> Unit
+) {
     val pagerState = rememberPagerState()
     val coroutineScope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -93,7 +113,11 @@ fun HomeScreen(modifier: Modifier = Modifier, user: User?, badgeNumber: Int, onL
                         ) { page ->
                             when (page) {
                                 0 -> Home()
-                                1 -> Notification()
+                                1 -> Notification(
+                                    notifications = notifications,
+                                    isNotificationLoading = isNotificationLoading,
+                                    getNotification = onGetNotifications
+                                )
                             }
                         }
                     }
@@ -124,11 +148,6 @@ private fun TopBar(
         })
         Tabs(pagerState, coroutineScope, badgeNumber)
     }
-}
-
-@Composable
-fun Notification(modifier: Modifier = Modifier) {
-    Surface(modifier = modifier.fillMaxSize()) {}
 }
 
 @Composable
@@ -172,18 +191,82 @@ fun Home(modifier: Modifier = Modifier) {
     }
 }
 
+@Composable
+fun Notification(
+    modifier: Modifier = Modifier,
+    notifications: State<List<Notification>>,
+    isNotificationLoading: State<Boolean>,
+    getNotification: () -> Unit
+) {
+    LaunchedEffect(key1 = true) {
+        getNotification()
+    }
+    Surface(modifier = modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Text(
+                modifier = Modifier.padding(
+                    start = 20.dp,
+                    top = 10.dp,
+                    end = 20.dp,
+                    bottom = 20.dp
+                ),
+                text = stringResource(id = R.string.notification_title),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+            if (isNotificationLoading.value) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    item {
+                        NotificationBox(
+                            title = stringResource(id = R.string.today),
+                            items = getTodayNotification(notifications.value)
+                        )
+                    }
+                    item {
+                        NotificationBox(
+                            title = stringResource(id = R.string.this_week),
+                            items = getThisWeekNotification(notifications.value)
+                        )
+                    }
+                    item {
+                        NotificationBox(
+                            title = stringResource(id = R.string.earlier),
+                            items = getEarlierNotification(notifications.value)
+                        )
+                    }
+                }
+            }
+
+        }
+    }
+}
+
 @Preview(showSystemUi = true)
 @Composable
 fun PreviewHomeScreen() {
+    val isLoading = remember {
+        mutableStateOf(false)
+    }
+    val notifications = remember {
+        mutableStateOf(listOf<Notification>())
+    }
     MyTluTheme {
         HomeScreen(
             user = User(
-                "Vu",
-                "Nguyen Ngoc",
                 "",
-                "https://static.vecteezy.com/system/resources/previews/002/275/847/original/male-avatar-profile-icon-of-smiling-caucasian-man-vector.jpg",
                 "",
-                "1951061127",
+                "",
+                "",
+                "",
+                "",
                 "",
                 "",
                 "",
@@ -195,7 +278,10 @@ fun PreviewHomeScreen() {
                 ""
             ),
             badgeNumber = 10,
-            onLogout = {}
+            notifications = notifications,
+            isNotificationLoading = isLoading,
+            onLogout = {},
+            onGetNotifications = {}
         )
     }
 }

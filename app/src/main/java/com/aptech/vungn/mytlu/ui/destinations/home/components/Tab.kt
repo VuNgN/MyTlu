@@ -23,8 +23,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.aptech.vungn.mytlu.util.lists.TabName
 import com.aptech.vungn.mytlu.util.lists.tabList
+import com.aptech.vungn.mytlu.util.types.TabName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
