@@ -17,4 +17,7 @@
     <string name="this_week">Tuần này</string>
     <string name="earlier">Xa hơn nữa</string>
     <string name="attendance_button">Điểm danh</string>
+    <string name="should_show_rationale">Bạn cần cấp cho ứng dụng quyền truy cập camera để sử dụng tính năng này.</string>
+    <string name="request_permission">Cấp quyền</string>
+    <string name="permission_deny">Ứng dụng không được cấp quyền truy cập camera.</string>
 </resources>

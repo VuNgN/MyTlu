@@ -32,12 +32,11 @@ import com.aptech.vungn.mytlu.util.date.sort.getThisWeekNotification
 import com.aptech.vungn.mytlu.util.date.sort.getTodayNotification
 import com.aptech.vungn.mytlu.util.types.DrawerItemName
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.util.*
 
 @Composable
-fun HomeDestination(viewModel: HomeViewModel, logout: () -> Job) {
+fun HomeDestination(viewModel: HomeViewModel, logout: () -> Unit, onAttending: () -> Unit) {
     val user by viewModel.user.observeAsState()
     val badgeNumber by viewModel.badgeNumber.collectAsState()
     val notifications = viewModel.notifications.collectAsState()
@@ -50,6 +49,7 @@ fun HomeDestination(viewModel: HomeViewModel, logout: () -> Job) {
                 notifications = notifications,
                 isNotificationLoading = isNotificationLoading,
                 onLogout = { logout() },
+                onAttending = onAttending,
                 onGetNotifications = { viewModel.getNotifications() }
             )
         }
@@ -65,6 +65,7 @@ fun HomeScreen(
     notifications: State<List<Notification>>,
     isNotificationLoading: State<Boolean>,
     onLogout: () -> Unit,
+    onAttending: () -> Unit,
     onGetNotifications: () -> Unit
 ) {
     val pagerState = rememberPagerState()
@@ -112,7 +113,7 @@ fun HomeScreen(
                             state = pagerState
                         ) { page ->
                             when (page) {
-                                0 -> Home()
+                                0 -> Home(onAttending = onAttending)
                                 1 -> Notification(
                                     notifications = notifications,
                                     isNotificationLoading = isNotificationLoading,
@@ -151,7 +152,7 @@ private fun TopBar(
 }
 
 @Composable
-fun Home(modifier: Modifier = Modifier) {
+fun Home(modifier: Modifier = Modifier, onAttending: () -> Unit) {
     val isDarkMode = isSystemInDarkTheme()
     Surface(
         modifier = modifier.fillMaxSize(),
@@ -172,7 +173,7 @@ fun Home(modifier: Modifier = Modifier) {
                 onClick1 = {},
                 icon2 = Icons.Rounded.HowToReg,
                 title2 = stringResource(id = R.string.menu_button_attendance),
-                onClick2 = {}
+                onClick2 = { onAttending() }
             )
             MenuButtonRow(
                 icon1 = Icons.Rounded.Exposure,
@@ -281,7 +282,7 @@ fun PreviewHomeScreen() {
             notifications = notifications,
             isNotificationLoading = isLoading,
             onLogout = {},
-            onGetNotifications = {}
-        )
+            onAttending = {}
+        ) {}
     }
 }

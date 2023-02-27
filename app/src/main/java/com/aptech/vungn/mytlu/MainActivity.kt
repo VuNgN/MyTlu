@@ -21,6 +21,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.aptech.vungn.mytlu.ui.activity.UserViewModel
 import com.aptech.vungn.mytlu.ui.activity.impl.UserViewModelImpl
+import com.aptech.vungn.mytlu.ui.destinations.camera.CameraDestination
 import com.aptech.vungn.mytlu.ui.destinations.home.HomeDestination
 import com.aptech.vungn.mytlu.ui.destinations.home.vm.HomeViewModel
 import com.aptech.vungn.mytlu.ui.destinations.home.vm.impl.HomeViewModelImpl
@@ -111,11 +112,13 @@ class MainActivity : ComponentActivity() {
                 val coroutineScope = rememberCoroutineScope()
                 HomeDestination(
                     viewModel = homeViewModel,
-                    logout = { coroutineScope.launch { userViewModel.logout() } }
+                    logout = { coroutineScope.launch { userViewModel.logout() } },
+                    onAttending = { coroutineScope.launch { navController.navigate(Routes.ATTENDANCE_DESTINATION) } }
                 )
             }
             composable(route = Routes.ATTENDANCE_DESTINATION) {
-
+                val coroutineScope = rememberCoroutineScope()
+                CameraDestination(onBack = { coroutineScope.launch { navController.popBackStack() } })
             }
             composable(route = Routes.NEWS_DESTINATION) {
 
