@@ -1,6 +1,10 @@
 package com.aptech.vungn.mytlu.ui.destinations.camera
 
+import android.util.Log
+import android.util.Size
 import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
@@ -14,9 +18,7 @@ import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Cameraswitch
 import androidx.compose.material.icons.rounded.FlashOn
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,7 +27,9 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.ContextCompat
 import com.aptech.vungn.mytlu.R
+import com.aptech.vungn.mytlu.ui.destinations.camera.analyzer.QrCodeAnalyzer
 import com.aptech.vungn.mytlu.ui.theme.MyTluTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -35,6 +39,7 @@ import com.google.accompanist.permissions.shouldShowRationale
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun CameraDestination(onBack: () -> Unit) {
+    var code by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val cameraPermissionState =
@@ -52,7 +57,7 @@ fun CameraDestination(onBack: () -> Unit) {
             topBar = {
                 TopAppBar(
                     modifier = Modifier,
-                    title = {},
+                    title = { Text(text = code ?: "") },
                     navigationIcon = {
                         IconButton(onClick = { onBack() }) {
                             Icon(
@@ -83,13 +88,29 @@ fun CameraDestination(onBack: () -> Unit) {
             if (cameraPermissionState.status.isGranted) {
                 AndroidView(
                     factory = {
+                        val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+                        val preview = Preview.Builder().build()
+                            .also { it.setSurfaceProvider(previewView.surfaceProvider) }
+                        val imageAnalysis = ImageAnalysis.Builder()
+                            .setTargetResolution(Size(previewView.width, previewView.height))
+                            .setBackpressureStrategy(STRATEGY_KEEP_ONLY_LATEST)
+                            .build()
+                        imageAnalysis.setAnalyzer(
+                            ContextCompat.getMainExecutor(context),
+                            QrCodeAnalyzer { result ->
+                                code = result
+                                Log.d("", "CameraDestination: Qr code -> $result")
+                            }
+                        )
                         try {
-                            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-                            val preview = Preview.Builder().build()
-                                .also { it.setSurfaceProvider(previewView.surfaceProvider) }
                             cameraProviderFuture.get().unbindAll()
                             cameraProviderFuture.get()
-                                .bindToLifecycle(lifecycleOwner, cameraSelector, preview)
+                                .bindToLifecycle(
+                                    lifecycleOwner,
+                                    cameraSelector,
+                                    preview,
+                                    imageAnalysis
+                                )
 
                         } catch (e: Exception) {
                             e.printStackTrace()
