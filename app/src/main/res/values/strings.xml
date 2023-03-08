@@ -20,4 +20,7 @@
     <string name="should_show_rationale">Bạn cần cấp cho ứng dụng quyền truy cập camera để sử dụng tính năng này.</string>
     <string name="request_permission">Cấp quyền</string>
     <string name="permission_deny">Ứng dụng không được cấp quyền truy cập camera.</string>
+    <string name="description_back_navigation">Back navigation</string>
+    <string name="description_switch_camera">Switch camera</string>
+    <string name="button_attendance">Điểm danh</string>
 </resources>

@@ -32,6 +32,7 @@ import com.aptech.vungn.mytlu.util.date.sort.getThisWeekNotification
 import com.aptech.vungn.mytlu.util.date.sort.getTodayNotification
 import com.aptech.vungn.mytlu.util.types.DrawerItemName
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -41,22 +42,30 @@ fun HomeDestination(viewModel: HomeViewModel, logout: () -> Unit, onAttending: (
     val badgeNumber by viewModel.badgeNumber.collectAsState()
     val notifications = viewModel.notifications.collectAsState()
     val isNotificationLoading = viewModel.isNotificationLoading.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
     MyTluTheme {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-            HomeScreen(
-                user = user,
+            HomeScreen(user = user,
                 badgeNumber = badgeNumber,
                 notifications = notifications,
                 isNotificationLoading = isNotificationLoading,
-                onLogout = { logout() },
+                onLogout = {
+                    coroutineScope.launch {
+                        logout()
+                    }
+                },
                 onAttending = onAttending,
-                onGetNotifications = { viewModel.getNotifications() }
+                onGetNotifications = {
+                    coroutineScope.launch(Dispatchers.IO) {
+                        viewModel.getNotifications()
+                    }
+                }
             )
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
@@ -73,28 +82,23 @@ fun HomeScreen(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-        ModalNavigationDrawer(
-            drawerState = drawerState,
-            drawerContent = {
-                DrawerContent(
-                    user = user,
-                    onClose = { coroutineScope.launch { drawerState.close() } },
-                    onItemClick = { name ->
-                        coroutineScope.launch {
-                            when (name) {
-                                DrawerItemName.PROFILE -> {}
-                                DrawerItemName.ACADEMIC_RESULT -> {}
-                                DrawerItemName.ATTENDANCE_HISTORY -> {}
-                                DrawerItemName.DARK_MODE -> {}
-                                DrawerItemName.LOGOUT -> {
-                                    onLogout()
-                                }
+        ModalNavigationDrawer(drawerState = drawerState, drawerContent = {
+            DrawerContent(user = user,
+                onClose = { coroutineScope.launch { drawerState.close() } },
+                onItemClick = { name ->
+                    coroutineScope.launch {
+                        when (name) {
+                            DrawerItemName.PROFILE -> {}
+                            DrawerItemName.ACADEMIC_RESULT -> {}
+                            DrawerItemName.ATTENDANCE_HISTORY -> {}
+                            DrawerItemName.DARK_MODE -> {}
+                            DrawerItemName.LOGOUT -> {
+                                onLogout()
                             }
                         }
                     }
-                )
-            }
-        ) {
+                })
+        }) {
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
                 Scaffold(
                     modifier = modifier,
@@ -108,9 +112,7 @@ fun HomeScreen(
                             .padding(paddingValues)
                     ) {
                         HorizontalPager(
-                            modifier = Modifier.fillMaxSize(),
-                            pageCount = 2,
-                            state = pagerState
+                            modifier = Modifier.fillMaxSize(), pageCount = 2, state = pagerState
                         ) { page ->
                             when (page) {
                                 0 -> Home(onAttending = onAttending)
@@ -167,27 +169,21 @@ fun Home(modifier: Modifier = Modifier, onAttending: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            MenuButtonRow(
-                icon1 = Icons.Rounded.Newspaper,
+            MenuButtonRow(icon1 = Icons.Rounded.Newspaper,
                 title1 = stringResource(id = R.string.menu_button_newspaper),
                 onClick1 = {},
                 icon2 = Icons.Rounded.HowToReg,
                 title2 = stringResource(id = R.string.menu_button_attendance),
-                onClick2 = { onAttending() }
-            )
-            MenuButtonRow(
-                icon1 = Icons.Rounded.Exposure,
+                onClick2 = { onAttending() })
+            MenuButtonRow(icon1 = Icons.Rounded.Exposure,
                 title1 = stringResource(id = R.string.menu_button_newspaper),
                 onClick1 = {},
                 icon2 = Icons.Rounded.Pages,
                 title2 = stringResource(id = R.string.menu_button_attendance),
-                onClick2 = {}
-            )
-            MenuButtonRow(
-                icon1 = Icons.Rounded.AcUnit,
+                onClick2 = {})
+            MenuButtonRow(icon1 = Icons.Rounded.AcUnit,
                 title1 = stringResource(id = R.string.menu_button_newspaper),
-                onClick1 = {}
-            )
+                onClick1 = {})
         }
     }
 }
@@ -210,10 +206,7 @@ fun Notification(
         ) {
             Text(
                 modifier = Modifier.padding(
-                    start = 20.dp,
-                    top = 10.dp,
-                    end = 20.dp,
-                    bottom = 20.dp
+                    start = 20.dp, top = 10.dp, end = 20.dp, bottom = 20.dp
                 ),
                 text = stringResource(id = R.string.notification_title),
                 style = MaterialTheme.typography.titleLarge,
@@ -260,29 +253,13 @@ fun PreviewHomeScreen() {
         mutableStateOf(listOf<Notification>())
     }
     MyTluTheme {
-        HomeScreen(
-            user = User(
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                Date(),
-                "",
-                "",
-                "",
-                "",
-                ""
-            ),
+        HomeScreen(user = User(
+            "", "", "", "", "", "", "", "", "", Date(), "", "", "", "", ""
+        ),
             badgeNumber = 10,
             notifications = notifications,
             isNotificationLoading = isLoading,
             onLogout = {},
-            onAttending = {}
-        ) {}
+            onAttending = {}) {}
     }
 }

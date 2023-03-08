@@ -1,63 +1,51 @@
 package com.aptech.vungn.mytlu.ui.destinations.camera.analyzer
 
-import android.graphics.ImageFormat
-import android.os.Build
+import android.util.Log
+import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
-import com.google.zxing.*
-import com.google.zxing.common.HybridBinarizer
-import java.nio.ByteBuffer
+import com.google.mlkit.vision.barcode.BarcodeScannerOptions
+import com.google.mlkit.vision.barcode.BarcodeScanning
+import com.google.mlkit.vision.barcode.common.Barcode
+import com.google.mlkit.vision.common.InputImage
+import java.util.concurrent.TimeUnit
 
 class QrCodeAnalyzer(private val qrCodeScanned: (String) -> Unit) : ImageAnalysis.Analyzer {
-    private val supportedImageFormats = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-        listOf(
-            ImageFormat.YUV_420_888,
-            ImageFormat.YUV_422_888,
-            ImageFormat.YUV_444_888
-        )
-    } else {
-        listOf(
-            ImageFormat.YUV_420_888
-        )
-    }
+    private val lastAnalyzedTimeStamp = 0L
 
+    @ExperimentalGetImage
     override fun analyze(image: ImageProxy) {
-        if (image.format in supportedImageFormats) {
-            val bytes = image.planes.first().buffer.toByteArray()
-            val source = PlanarYUVLuminanceSource(
-                bytes,
-                image.width,
-                image.height,
-                0,
-                0,
-                image.width,
-                image.height,
-                false
-            )
-            val binaryBmp = BinaryBitmap(HybridBinarizer(source))
-            try {
-                val result = MultiFormatReader().apply {
-                    setHints(
-                        mapOf(
-                            DecodeHintType.POSSIBLE_FORMATS to arrayListOf(
-                                BarcodeFormat.QR_CODE
-                            )
-                        )
-                    )
-                }.decode(binaryBmp)
-                qrCodeScanned(result.text)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            } finally {
-                image.close()
+        val currentTimestamp = System.currentTimeMillis()
+        if (currentTimestamp - lastAnalyzedTimeStamp >= TimeUnit.SECONDS.toMillis(1)) {
+            image.image?.let { imageToAnalyze ->
+                val option =
+                    BarcodeScannerOptions.Builder().setBarcodeFormats(Barcode.FORMAT_QR_CODE)
+                        .build()
+                val barcodeScanner = BarcodeScanning.getClient(option)
+                val imageToProcess =
+                    InputImage.fromMediaImage(imageToAnalyze, image.imageInfo.rotationDegrees)
+
+                barcodeScanner.process(imageToProcess).addOnSuccessListener { barcodes ->
+                    if (barcodes.isNotEmpty()) {
+                        var code = ""
+                        barcodes.forEach { barcode ->
+                            barcode.rawValue?.let { barcodeValue ->
+                                code = barcodeValue
+                                Log.d(TAG, "analyze QR code: $barcodeValue")
+                            }
+                        }
+                        qrCodeScanned(code)
+                    }
+                }.addOnFailureListener { exception ->
+                    Log.e(TAG, "BarcodeAnalyzer: somethings wrong -> $exception")
+                }.addOnCompleteListener {
+                    image.close()
+                }
             }
         }
     }
 
-    private fun ByteBuffer.toByteArray(): ByteArray {
-        rewind()
-        return ByteArray(remaining()).also {
-            get(it)
-        }
+    companion object {
+        private val TAG = QrCodeAnalyzer::class.simpleName
     }
 }
